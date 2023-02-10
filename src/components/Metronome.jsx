@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { CounterContext } from "../App";
+import { CounterContext, PatternContext } from "../App";
 import metronomeSFX from "/sfx/metronome.mp3";
 
 const Metronome = ({ bpm, setBpm, playing, setPlaying }) => {
