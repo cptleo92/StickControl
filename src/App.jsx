@@ -1,28 +1,32 @@
 import { useState, createContext, useEffect } from "react";
 import Metronome from "./components/Metronome";
 import Notation from "./components/Notation";
-import patterns from "./patterns/patterns.json";
+import patterns from "./patterns/patterns";
 
 export const CounterContext = createContext(null);
 export const PatternContext = createContext(null);
 
 function App() {
-  const [bpm, setBpm] = useState(60);
+  const [bpm, setBpm] = useState(150);
   const [playing, setPlaying] = useState(false);
   const [counter, setCounter] = useState(0);
   const [currentPattern, setCurrentPattern] = useState(0);
+  const [intervalId, setIntervalId] = useState();
+
+  const REPS = 4;
 
   const updatePattern = () => {
-    if (currentPattern < patterns.length) {
-      setCurrentPattern((pattern) => pattern + 1);
-    } else {
-      setPlaying(false);
-    }
+    setCurrentPattern((pattern) => (pattern + 1) % patterns.length);
   };
 
   const tick = () => {
-    setCounter((ct) => ct + 1);
-    updatePattern();
+    setCounter((ct) => {
+      if (ct > 0 && ct % (REPS * 8) === 0) {
+        updatePattern();
+        return 1;
+      }
+      return ct + 1;
+    });
   };
 
   const resetCounter = () => setCounter(0);
@@ -33,10 +37,21 @@ function App() {
         counter,
         tick,
         resetCounter,
+        playing,
+        setPlaying,
+        intervalId,
+        setIntervalId,
+        REPS,
       }}
     >
       <PatternContext.Provider
-        value={{ pattern: patterns[currentPattern], updatePattern }}
+        value={{
+          currentPattern,
+          pattern: patterns[currentPattern],
+          nextPattern: patterns[currentPattern + 1],
+          setCurrentPattern,
+          updatePattern,
+        }}
       >
         <div className="flex flex-col justify-center my-8 max-w-screen-md m-auto">
           <h1 className="text-center text-5xl my-4 underline">Stick Control</h1>
@@ -44,13 +59,9 @@ function App() {
           <h3 className="text-center text-xl my-1">
             <em>... for the Screen</em>
           </h3>
-          <Metronome
-            bpm={bpm}
-            setBpm={setBpm}
-            playing={playing}
-            setPlaying={setPlaying}
-          />
+          <Metronome bpm={bpm} setBpm={setBpm} />
           <Notation />
+          {currentPattern < patterns.length - 1 && <Notation preview />}
         </div>
       </PatternContext.Provider>
     </CounterContext.Provider>

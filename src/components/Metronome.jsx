@@ -2,15 +2,11 @@ import { useState, useEffect, useContext } from "react";
 import { CounterContext, PatternContext } from "../App";
 import metronomeSFX from "/sfx/metronome.mp3";
 
-const Metronome = ({ bpm, setBpm, playing, setPlaying }) => {
-  const [intervalId, setIntervalId] = useState();
+const Metronome = ({ bpm, setBpm }) => {
+  const { tick, resetCounter, playing, setPlaying, intervalId, setIntervalId } =
+    useContext(CounterContext);
 
   const audio = new Audio(metronomeSFX);
-  const { tick, resetCounter } = useContext(CounterContext);
-
-  // purpose of the setTimeouts:
-  // 1) synchronizes the sfx with the counter update
-  // 2) resets the counter after the final tick
 
   const togglePlaying = () => {
     if (playing) {
@@ -32,10 +28,13 @@ const Metronome = ({ bpm, setBpm, playing, setPlaying }) => {
       setPlaying(true);
     }
   };
+  // purpose of the setTimeouts:
+  // 1) synchronizes the sfx with the counter update
+  // 2) resets the counter after the final tick
 
   return (
     <div className="flex justify-center flex-col items-center my-8">
-      <div>
+      <label>
         <input
           type="number"
           className="text-black border-black border"
@@ -43,7 +42,8 @@ const Metronome = ({ bpm, setBpm, playing, setPlaying }) => {
           onChange={(e) => setBpm(e.target.value)}
         />
         BPM
-      </div>
+      </label>
+
       <div>
         <button
           className="bg-slate-300 py-2 px-4 border-black border-2 text-black my-4 rounded-md"

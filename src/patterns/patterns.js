@@ -1,4 +1,4 @@
-[
+export default [
   "rlrl rlrl rlrl rlrl",
   "lrlr lrlr lrlr lrlr",
   "rrll rrll rrll rrll",

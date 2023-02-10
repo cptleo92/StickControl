@@ -6,18 +6,17 @@ import { patternToStave } from "../patterns/patternToStave";
 
 const { Renderer, Stave, Formatter, Beam } = Vex.Flow;
 
-const Notation = () => {
+const Notation = ({ preview }) => {
   const ref = useRef();
-  const { counter } = useContext(CounterContext);
-  const { pattern } = useContext(PatternContext);
+  const { counter, REPS } = useContext(CounterContext);
+  const { currentPattern, pattern, nextPattern } = useContext(PatternContext);
 
   const [drawing, setDrawing] = useState(true);
 
   const drawNotes = () => {
     setDrawing(true);
-    const svg = document.querySelector("svg");
-    if (svg) svg.remove();
 
+    if (ref.current) ref.current.firstChild?.remove();
     const renderer = new Renderer(ref.current, Renderer.Backends.SVG);
 
     renderer.resize(620, 100);
@@ -33,7 +32,7 @@ const Notation = () => {
     );
     staveMeasure2.setContext(context).draw();
 
-    const notes = patternToStave(pattern);
+    const notes = patternToStave(preview ? nextPattern : pattern);
 
     const beams = notes.map((beam) => new Beam(beam));
 
@@ -47,24 +46,42 @@ const Notation = () => {
     setDrawing(false);
   };
 
+  const getPreviewClass = () => {
+    if (preview) {
+      if (counter > (REPS - 1) * 8) {
+        return "opacity-20";
+      } else {
+        return "opacity-0";
+      }
+    }
+  };
+
   useEffect(() => {
     drawNotes();
   }, [pattern]);
 
   return (
     <>
-      <div className="flex items-center justify-center">
-        <p className={`translate-y-2 text-5xl mx-6`}>1</p>
-        <div className="text-center" ref={ref}></div>
-        <p
-          className={`translate-y-2 text-5xl mx-6 ${
-            counter === 0 && "opacity-0"
-          }`}
-        >
-          {Math.ceil(counter / 4)}
+      <div
+        className={`flex items-center justify-center mt-8 transition-all
+          ${getPreviewClass()}
+        `}
+      >
+        <p className={`translate-y-2 text-5xl mx-6`}>
+          {preview ? currentPattern + 2 : currentPattern + 1}
         </p>
+        <div className="text-center container" ref={ref}></div>
+        {!preview && (
+          <p
+            className={`translate-y-2 text-5xl mx-6 ${
+              counter === 0 && "opacity-0"
+            }`}
+          >
+            {Math.ceil(counter / 8)}
+          </p>
+        )}
       </div>
-      {!drawing && <NotationLetters />}
+      {!drawing && <NotationLetters preview={preview} />}
     </>
   );
 };

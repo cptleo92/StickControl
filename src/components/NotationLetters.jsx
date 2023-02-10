@@ -1,9 +1,10 @@
 import { useContext } from "react";
-import { PatternContext } from "../App";
+import { CounterContext, PatternContext } from "../App";
 
-const NotationLetters = () => {
+const NotationLetters = ({ preview }) => {
   // "rlrl rlrl rlrl rlrl",
   const { pattern } = useContext(PatternContext);
+  const { counter, REPS } = useContext(CounterContext);
 
   // [["R", "L", "R", "L", "R", "L", "R", "L"], ["R", "L", "R", "L", "R", "L", "R", "L"]
   // const letters = [[], []];
@@ -31,23 +32,34 @@ const NotationLetters = () => {
     if (char !== " ") letters.push(char.toUpperCase());
   }
 
-  const notes = document.querySelectorAll(".vf-notehead");
-  const positions = [];
-  notes.forEach((note) =>
-    positions.push(Math.trunc(note.getBoundingClientRect().left))
-  );
+  // const notes = document.querySelectorAll(".vf-notehead");
+  // const positions = [];
+  // notes.forEach((note) =>
+  //   positions.push(Math.trunc(note.getBoundingClientRect().left))
+  // );
 
-  const spacings = [];
+  // const spacings = [];
 
-  for (let i = 1; i < positions.length; i++) {
-    spacings.push(`mr-[${positions[i] - positions[i - 1]}px]`);
-  }
+  // for (let i = 1; i < positions.length; i++) {
+  //   spacings.push(`mr-[${positions[i] - positions[i - 1]}px]`);
+  // }
 
-  spacings.push(0);
-  console.log(spacings);
+  // spacings.push(0);
+
+  const getPreviewClass = () => {
+    if (preview) {
+      if (counter > (REPS - 1) * 8) {
+        return "opacity-20";
+      } else {
+        return "opacity-0";
+      }
+    }
+  };
 
   return (
-    <div className="flex translate-x-[90px]">
+    <div
+      className={`flex translate-x-[90px] ${getPreviewClass()} transition-all`}
+    >
       {letters.slice(0, 8).map((letter, idx) => (
         <div key={idx} className="mr-[27px]">
           {letter}
