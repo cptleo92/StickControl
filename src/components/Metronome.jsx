@@ -8,17 +8,24 @@ const Metronome = ({ bpm, setBpm, playing, setPlaying }) => {
   const audio = new Audio(metronomeSFX);
   const { tick, resetCounter } = useContext(CounterContext);
 
+  // purpose of the setTimeouts:
+  // 1) synchronizes the sfx with the counter update
+  // 2) resets the counter after the final tick
+
   const togglePlaying = () => {
     if (playing) {
-      resetCounter();
       clearInterval(intervalId);
       setPlaying(false);
+
+      setTimeout(() => {
+        resetCounter();
+      }, 400);
     } else {
       setIntervalId(
-        setInterval(() => {
-          audio.currentTime = 0.02;
-          audio.play();
-          tick();
+        setInterval(async () => {
+          audio.currentTime = 0;
+
+          audio.play().then(() => setTimeout(tick, 400));
         }, (60 / bpm) * 1000)
       );
 
