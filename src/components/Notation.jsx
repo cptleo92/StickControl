@@ -14,10 +14,10 @@ const Notation = () => {
 
     const renderer = new Renderer(ref.current, Renderer.Backends.SVG);
 
-    renderer.resize(415, 415);
+    renderer.resize(415, 100);
     const context = renderer.getContext();
 
-    const stave = new Stave(10, 40, 400);
+    const stave = new Stave(0, 0, 400);
     stave.addClef("bass");
 
     stave.setContext(context).draw();
@@ -55,14 +55,10 @@ const Notation = () => {
   }, []);
 
   return (
-    <div className="flex">
-      <div className="m-auto text-center relative" ref={ref}></div>
+    <div className="flex items-center justify-center">
+      <div className="text-center" ref={ref}></div>
 
-      <p
-        className={`translate-y-16 text-5xl -translate-x-16 ${
-          counter === 0 && "opacity-0"
-        }`}
-      >
+      <p className={`text-5xl mx-6 ${counter === 0 && "opacity-0"}`}>
         {Math.ceil(counter / 4)}
       </p>
     </div>
