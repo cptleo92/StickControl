@@ -1,15 +1,14 @@
-import { useEffect, useRef, useContext, useState } from "react";
-import { CounterContext, PatternContext } from "../App";
+import { useContext, useEffect, useRef, useState } from "react";
 import Vex from "vexflow";
 import NotationLetters from "./NotationLetters";
 import { patternToStave } from "../patterns/patternToStave";
+import { CounterContext, REPS } from "../App";
 
 const { Renderer, Stave, Formatter, Beam } = Vex.Flow;
 
-const Notation = ({ preview }) => {
+const Notation = ({ preview, pattern, currentPattern, nextPattern }) => {
   const ref = useRef();
-  const { counter, REPS } = useContext(CounterContext);
-  const { currentPattern, pattern, nextPattern } = useContext(PatternContext);
+  const { counter } = useContext(CounterContext);
 
   const [drawing, setDrawing] = useState(true);
 
@@ -48,7 +47,7 @@ const Notation = ({ preview }) => {
 
   const getPreviewClass = () => {
     if (preview) {
-      if (counter > (REPS - 1) * 8) {
+      if (counter > (REPS - 1) * 16) {
         return "opacity-20";
       } else {
         return "opacity-0";
@@ -77,11 +76,18 @@ const Notation = ({ preview }) => {
               counter === 0 && "opacity-0"
             }`}
           >
-            {Math.ceil(counter / 8)}
+            {Math.ceil(counter / 16)}
           </p>
         )}
       </div>
-      {!drawing && <NotationLetters preview={preview} />}
+
+      {!drawing && (
+        <NotationLetters
+          counter={counter}
+          pattern={pattern}
+          preview={preview}
+        />
+      )}
     </>
   );
 };

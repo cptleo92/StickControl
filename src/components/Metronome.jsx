@@ -1,36 +1,36 @@
-import { useState, useEffect, useContext } from "react";
-import { CounterContext, PatternContext } from "../App";
+import { useContext, useState } from "react";
+import { CounterContext } from "../App";
 import metronomeSFX from "/sfx/metronome.mp3";
 
-const Metronome = ({ bpm, setBpm }) => {
-  const { tick, resetCounter, playing, setPlaying, intervalId, setIntervalId } =
-    useContext(CounterContext);
-
+const Metronome = ({ setCounter, bpm, setBpm, tick, playing, setPlaying }) => {
   const audio = new Audio(metronomeSFX);
 
+  const [intervalId, setIntervalId] = useState();
+
+  // purpose of the setTimeouts:
+  // 1) synchronizes the sfx with the counter update
+  // 2) resets the counter after the final tick
   const togglePlaying = () => {
     if (playing) {
       clearInterval(intervalId);
       setPlaying(false);
 
       setTimeout(() => {
-        resetCounter();
+        setCounter(0);
       }, 400);
     } else {
       setIntervalId(
-        setInterval(async () => {
+        setInterval(() => {
           audio.currentTime = 0;
+          audio.play();
 
-          audio.play().then(() => setTimeout(tick, 400));
+          setTimeout(tick, 300);
         }, (60 / bpm) * 1000)
       );
 
       setPlaying(true);
     }
   };
-  // purpose of the setTimeouts:
-  // 1) synchronizes the sfx with the counter update
-  // 2) resets the counter after the final tick
 
   return (
     <div className="flex justify-center flex-col items-center my-8">
