@@ -37,24 +37,89 @@
       playing = true;
     }
   };
+
+  const handleChange = () => {
+    if (playing) {
+      togglePlaying();
+      togglePlaying();
+    }
+  };
+
+  $: patternSelect = $currentPattern + 1;
 </script>
 
-<div class="flex justify-center flex-col items-center my-8">
-  <label>
+<div class="flex flex-col items-end my-8">
+  <input
+    type="range"
+    min="30"
+    max="240"
+    class="slider"
+    on:change={handleChange}
+    bind:value={bpm}
+  />
+  <p>
+    BPM:
     <input
+      class="text-3xl font-bold border p-1 w-24 text-center ml-2"
       type="number"
-      class="text-black border-black border"
+      min="30"
+      max="240"
       bind:value={bpm}
+      on:change={handleChange}
     />
-    BPM
-  </label>
+  </p>
 
-  <div>
-    <button
-      class="bg-slate-300 py-2 px-4 border-black border-2 text-black my-4 rounded-md"
-      on:click={togglePlaying}
-    >
-      {playing ? 'Stop' : 'Start'}
-    </button>
-  </div>
+  <input
+    type="range"
+    min="1"
+    max={$patterns.length - 1}
+    class="slider"
+    bind:value={patternSelect}
+    on:change={() => ($currentPattern = patternSelect - 1)}
+  />
+  <p>
+    Current Pattern: <input
+      class="text-3xl font-bold border p-1 w-24 text-center ml-2"
+      type="number"
+      min="1"
+      max={$patterns.length - 1}
+      bind:value={patternSelect}
+    />
+  </p>
 </div>
+
+<button
+  class="bg-slate-300 py-2 px-4 border-black border-2 text-black my-4 rounded-md mx-auto"
+  on:click={togglePlaying}
+>
+  {playing ? 'Stop' : 'Start'}
+</button>
+
+<style>
+  .slider {
+    width: 100%;
+    height: 20px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #04aa6d;
+    cursor: pointer;
+  }
+
+  .slider::-moz-range-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #04aa6d;
+    cursor: pointer;
+  }
+</style>

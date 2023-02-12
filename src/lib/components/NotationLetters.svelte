@@ -9,8 +9,6 @@
     if (char !== ' ') letters.push(char.toUpperCase());
   }
 
-  console.log('rerender');
-
   $: previewClass = $counter > ($reps - 1) * 16 ? 'opacity-25' : 'opacity-0';
 
   $: letterClass = idx => {
