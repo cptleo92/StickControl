@@ -12,7 +12,7 @@
     // @ts-ignore
     const renderer = new Renderer(container, Renderer.Backends.SVG);
 
-    renderer.resize(565, 100);
+    renderer.resize(575, 100);
     const context = renderer.getContext();
 
     const staveMeasure1 = new Stave(0, 0, 280);
@@ -41,13 +41,13 @@
   onMount(() => drawNotes());
 </script>
 
-<div class="flex items-center justify-center mt-8">
-  <p class={`translate-y-2 text-5xl mx-6`}>
+<div class="flex items-center mt-8">
+  <p class={`translate-y-2 text-5xl mx-4`}>
     {$currentPattern < 9 ? '0' : ''}{$currentPattern + 1}
   </p>
   <div class="text-center container" />
 
-  <p class={`translate-y-2 text-5xl mx-6 ${$counter === 0 && 'opacity-0'}`}>
+  <p class={`translate-y-2 text-5xl mx-4 ${$counter === 0 && 'opacity-0'}`}>
     {Math.ceil($counter / 16)}
   </p>
 </div>

@@ -38,62 +38,104 @@
     }
   };
 
-  const handleChange = () => {
+  const handleChangeBPM = () => {
+    bpm = Math.max(bpm, 30);
+    bpm = Math.min(bpm, 240);
+
     if (playing) {
       togglePlaying();
       togglePlaying();
     }
   };
 
+  const handleChangePattern = () => {
+    patternSelect = Math.max(patternSelect, 1);
+    patternSelect = Math.min(patternSelect, $patterns.length - 1);
+
+    $currentPattern = patternSelect - 1;
+  };
+
+  const handleChangeReps = e => {
+    let newReps = Math.max(e.target.value, 1);
+    newReps = Math.min(newReps, 30);
+
+    $reps = newReps;
+  };
+
   $: patternSelect = $currentPattern + 1;
 </script>
 
-<div class="flex flex-col items-end my-8">
-  <input
-    type="range"
-    min="30"
-    max="240"
-    class="slider"
-    on:change={handleChange}
-    bind:value={bpm}
-  />
-  <p>
-    BPM:
+<section class="border mt-8 -mx-6 p-6 bg-slate-300">
+  <h2 class="text-center font-semibold">Metronome Settings</h2>
+  <div class="flex flex-col items-end my-8">
     <input
-      class="text-3xl font-bold border p-1 w-24 text-center ml-2"
-      type="number"
+      type="range"
       min="30"
       max="240"
+      class="slider"
+      on:input={handleChangeBPM}
       bind:value={bpm}
-      on:change={handleChange}
     />
-  </p>
+    <p>
+      BPM:
+      <input
+        class="text-3xl font-bold border p-1 w-24 text-center ml-2"
+        type="number"
+        min="30"
+        max="240"
+        bind:value={bpm}
+        on:change={handleChangeBPM}
+      />
+    </p>
 
-  <input
-    type="range"
-    min="1"
-    max={$patterns.length - 1}
-    class="slider"
-    bind:value={patternSelect}
-    on:change={() => ($currentPattern = patternSelect - 1)}
-  />
-  <p>
-    Current Pattern: <input
-      class="text-3xl font-bold border p-1 w-24 text-center ml-2"
-      type="number"
+    <input
+      type="range"
       min="1"
       max={$patterns.length - 1}
+      class="slider"
       bind:value={patternSelect}
+      on:input={handleChangePattern}
     />
-  </p>
-</div>
+    <p>
+      Current Pattern: <input
+        class="text-3xl font-bold border p-1 w-24 text-center ml-2"
+        type="number"
+        min="1"
+        max={$patterns.length - 1}
+        bind:value={patternSelect}
+        on:change={handleChangePattern}
+      />
+    </p>
 
-<button
-  class="bg-slate-300 py-2 px-4 border-black border-2 text-black my-4 rounded-md mx-auto"
-  on:click={togglePlaying}
->
-  {playing ? 'Stop' : 'Start'}
-</button>
+    <input
+      type="range"
+      min="1"
+      max={30}
+      class="slider"
+      bind:value={$reps}
+      on:change={handleChangeReps}
+    />
+    <p>
+      Number of Reps: <input
+        class="text-3xl font-bold border p-1 w-24 text-center ml-2"
+        type="number"
+        min="1"
+        max={30}
+        bind:value={$reps}
+        on:change={handleChangeReps}
+      />
+    </p>
+  </div>
+
+  <div class="flex justify-center">
+    <button
+      class="bg-slate-100 py-2 px-4 border-black border-2 text-black text-2xl my-4 rounded-md hover:bg-slate-200 transition-all mx-auto"
+      on:click={togglePlaying}
+    >
+      {playing ? 'Stop' : 'Start'}
+    </button>
+  </div>
+</section>
 
 <style>
   .slider {

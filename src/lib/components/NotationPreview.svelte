@@ -12,17 +12,17 @@
     // @ts-ignore
     const renderer = new Renderer(container, Renderer.Backends.SVG);
 
-    renderer.resize(620, 100);
+    renderer.resize(575, 100);
     const context = renderer.getContext();
 
-    const staveMeasure1 = new Stave(0, 0, 300);
+    const staveMeasure1 = new Stave(0, 0, 280);
     staveMeasure1.setContext(context).draw();
 
     const staveMeasure2 = new Stave(
       // @ts-ignore
       staveMeasure1.width + staveMeasure1.x,
       0,
-      300
+      280
     );
     staveMeasure2.setContext(context).draw();
 
@@ -44,10 +44,13 @@
 </script>
 
 <div
-  class={`flex items-center justify-center mt-8 transition-all
+  class={`flex items-center  mt-8 transition-all
   ${previewClass}
 `}
 >
+  <p class={`translate-y-2 text-5xl mx-4`}>
+    {$currentPattern < 8 ? '0' : ''}{$currentPattern + 2}
+  </p>
   <div class="text-center container-prev" />
 </div>
 
