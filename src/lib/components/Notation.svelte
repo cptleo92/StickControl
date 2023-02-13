@@ -1,6 +1,6 @@
 <script>
   import Vex from 'vexflow';
-  import {counter, currentPattern, patterns} from '../store';
+  import {counter, reps, timer, currentPattern, patterns} from '../store';
   import {patternToStave} from '../patterns/patternToStave';
   import {onMount} from 'svelte';
   import NotationLetters from './NotationLetters.svelte';
@@ -48,7 +48,7 @@
   <div class="text-center container" />
 
   <p class={`translate-y-2 text-5xl mx-4 ${$counter === 0 && 'opacity-0'}`}>
-    {Math.ceil($counter / 16)}
+    {$reps.selected ? Math.ceil($counter / 16) : $timer.currentSeconds}
   </p>
 </div>
 

@@ -28,10 +28,11 @@
     </h4>
   </div> -->
     <div class="relative border p-2 rounded-md">
-      <img class="w-[70%] m-auto" src="/stick-control.png" alt="logo" />
+      <img class="w-[60%] m-auto" src="/stick-control.png" alt="logo" />
+
       <h4
         in:fly={{delay: 1000, duration: 1000, x: -50}}
-        class="absolute right-36 top-72 font-semibold underline"
+        class="absolute right-36 top-64 font-semibold underline"
       >
         <em>... for the Screen</em>
       </h4>

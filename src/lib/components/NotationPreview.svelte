@@ -1,6 +1,6 @@
 <script>
   import Vex from 'vexflow';
-  import {counter, reps, currentPattern, patterns} from '../store';
+  import {counter, reps, timer, currentPattern, patterns} from '../store';
   import {patternToStave} from '../patterns/patternToStave';
   import {onMount} from 'svelte';
   import NotationLetters from './NotationLetters.svelte';
@@ -38,7 +38,11 @@
     });
   };
 
-  $: previewClass = $counter > ($reps - 1) * 16 ? 'opacity-25' : 'opacity-0';
+  $: previewClass =
+    ($reps.selected && $counter > ($reps.count - 1) * 16) ||
+    ($timer.selected && $timer.currentSeconds <= 3)
+      ? 'opacity-25'
+      : 'opacity-0';
 
   onMount(() => drawNotes());
 </script>

@@ -1,6 +1,6 @@
 <script>
   import {onMount} from 'svelte';
-  import {counter, reps} from '../store';
+  import {counter, reps, timer} from '../store';
 
   export let pattern;
   export let preview = false;
@@ -10,7 +10,11 @@
     if (char !== ' ') letters.push(char.toUpperCase());
   }
 
-  $: previewClass = $counter > ($reps - 1) * 16 ? 'opacity-25' : 'opacity-0';
+  $: previewClass =
+    ($reps.selected && $counter > ($reps.count - 1) * 16) ||
+    ($timer.selected && $timer.currentSeconds <= 3)
+      ? 'opacity-25'
+      : 'opacity-0';
 
   $: letterClass = idx => {
     if (preview) return 'mr-[23px]';
