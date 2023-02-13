@@ -1,4 +1,5 @@
 <script>
+  import {onMount} from 'svelte';
   import {counter, reps} from '../store';
 
   export let pattern;
@@ -12,15 +13,23 @@
   $: previewClass = $counter > ($reps - 1) * 16 ? 'opacity-25' : 'opacity-0';
 
   $: letterClass = idx => {
-    if (preview) return 'mr-[27px]';
-    return `mr-[27px] ${
+    if (preview) return 'mr-[24px]';
+    return `mr-[24px] ${
       idx === ($counter - 1) % 16 && 'text-emerald-800 font-bold'
     }`;
   };
+
+  onMount(() => {
+    const note = document.querySelector('.vf-notehead');
+    console.log('note: ', note?.getBoundingClientRect());
+
+    const box = document.querySelector('.main');
+    console.log('box: ', box?.getBoundingClientRect());
+  });
 </script>
 
 <div
-  class={`flex translate-x-[90px] ${preview && previewClass} transition-all`}
+  class={`flex translate-x-[103px] ${preview && previewClass} transition-all`}
 >
   {#each letters.slice(0, 8) as letter, idx}
     <div class={letterClass(idx)}>
