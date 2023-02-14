@@ -47,7 +47,7 @@
   </p>
   <div class="text-center container" />
 
-  <p class={`translate-y-2 text-5xl mx-4 ${$counter === 0 && 'opacity-0'}`}>
+  <p class={`translate-y-2 text-5xl ${$counter === 0 && 'opacity-0'}`}>
     {$reps.selected ? Math.ceil($counter / 16) : $timer.currentSeconds}
   </p>
 </div>

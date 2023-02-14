@@ -1,5 +1,4 @@
 <script>
-  import {onMount} from 'svelte';
   import {counter, reps, timer} from '../store';
 
   export let pattern;
@@ -17,9 +16,10 @@
       : 'opacity-0';
 
   $: letterClass = idx => {
-    if (preview) return 'mr-[23px]';
-    return `mr-[23px] ${
-      idx === ($counter - 1) % 16 && 'text-emerald-800 font-bold'
+    if (preview) return 'letter mr-[23px]';
+    return `letter mr-[23px] ${
+      idx === ($counter - 1) % 16 &&
+      'text-emerald-800 font-bold translate-y-1 transition-all'
     }`;
   };
 </script>

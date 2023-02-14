@@ -1,7 +1,8 @@
 <script>
   import metronomeSFX from '/metronome.mp3';
   import {counter, reps, timer, currentPattern, patterns} from '../store';
-  import {fade} from 'svelte/transition';
+  import {crossfade, fade} from 'svelte/transition';
+  import {linear} from 'svelte/easing';
 
   let bpm = 120;
   let playing = false;

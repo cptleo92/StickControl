@@ -18,7 +18,7 @@
 <Nav />
 {#if ready}
   <div
-    class="main box-border flex flex-col justify-center my-8 max-w-screen-md m-auto bg-white p-6 border rounded-md shadow-md"
+    class="main box-border flex flex-col justify-center my-8 max-w-screen-md m-auto bg-white p-8 border rounded-md shadow-md"
   >
     <!-- <div class="text-center">
     <h1>Stick Control</h1>

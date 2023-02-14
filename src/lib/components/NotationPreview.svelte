@@ -48,7 +48,7 @@
 </script>
 
 <div
-  class={`flex items-center  mt-8 transition-all
+  class={`flex items-center mt-8 transition-all
   ${previewClass}
 `}
 >
@@ -57,5 +57,4 @@
   </p>
   <div class="text-center container-prev" />
 </div>
-
 <NotationLetters pattern={$patterns[$currentPattern + 1]} preview={true} />
