@@ -8,7 +8,7 @@
   import Notation from './lib/components/Notation.svelte';
   import NotationPreview from './lib/components/NotationPreview.svelte';
 
-  import {currentPattern} from './lib/store';
+  import {currentPattern, patterns} from './lib/store';
 
   let ready = false;
 
@@ -41,7 +41,9 @@
 
     {#key $currentPattern}
       <Notation />
-      <NotationPreview />
+      {#if $currentPattern < $patterns.length - 1}
+        <NotationPreview />
+      {/if}
     {/key}
 
     <Instructions />

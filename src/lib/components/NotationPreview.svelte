@@ -57,4 +57,5 @@
   </p>
   <div class="text-center container-prev" />
 </div>
+
 <NotationLetters pattern={$patterns[$currentPattern + 1]} preview={true} />

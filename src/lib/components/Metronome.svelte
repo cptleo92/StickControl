@@ -52,6 +52,7 @@
   let timerInterval;
   const togglePlaying = () => {
     if (playing) {
+      audio.currentTime = 0;
       clearInterval(intervalId);
       clearInterval(timerInterval);
       playing = false;
@@ -96,11 +97,11 @@
     }
   };
 
-  const handleChangePattern = () => {
-    patternSelect = Math.max(patternSelect, 1);
-    patternSelect = Math.min(patternSelect, $patterns.length - 1);
+  const handleChangePattern = e => {
+    let newPattern = Math.max(e.target.value, 1);
+    newPattern = Math.min(newPattern, $patterns.length);
 
-    $currentPattern = patternSelect - 1;
+    $currentPattern = newPattern - 1;
   };
 
   const handleChangeReps = e => {
@@ -161,7 +162,7 @@
     <input
       type="range"
       min="1"
-      max={$patterns.length - 1}
+      max={$patterns.length}
       class="slider"
       bind:value={patternSelect}
       on:input={handleChangePattern}
@@ -171,7 +172,7 @@
         class="text-3xl font-bold border p-1 w-24 text-center ml-2"
         type="number"
         min="1"
-        max={$patterns.length - 1}
+        max={$patterns.length}
         bind:value={patternSelect}
         on:change={handleChangePattern}
       />
