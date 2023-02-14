@@ -1,14 +1,21 @@
 <script>
   import metronomeSFX from '/metronome.mp3';
   import {counter, reps, timer, currentPattern, patterns} from '../store';
-  import {crossfade, fade} from 'svelte/transition';
-  import {linear} from 'svelte/easing';
+  import {fade} from 'svelte/transition';
 
   let bpm = 120;
   let playing = false;
   let intervalId;
 
+  // loads in an audio click and plays on every other tick
+  const audio = new Audio(metronomeSFX);
+
   $: downbeat = $counter % 2 === 0;
+
+  $: if (playing && downbeat) {
+    audio.currentTime = 0;
+    audio.play();
+  }
 
   const handleStart = () => {
     playing ? togglePlaying() : countdownBeforePlaying();
@@ -31,8 +38,6 @@
     }, 1000);
   };
 
-  const audio = new Audio(metronomeSFX);
-
   const updateByReps = () => {
     if ($counter > 0 && $counter % ($reps.count * 16) === 0) {
       $currentPattern = ($currentPattern + 1) % $patterns.length;
@@ -40,14 +45,9 @@
     }
   };
 
-  const updateByTime = () => {
+  const updateTimer = () => {
     if ($timer.currentSeconds !== 0) $timer.currentSeconds -= 1;
   };
-
-  $: if (playing && downbeat) {
-    audio.currentTime = 0;
-    audio.play();
-  }
 
   let timerInterval;
   const togglePlaying = () => {
@@ -59,7 +59,14 @@
     } else {
       $timer.currentSeconds = $timer.startSeconds;
 
-      if ($timer.selected) timerInterval = setInterval(updateByTime, 1000);
+      if ($timer.selected) timerInterval = setInterval(updateTimer, 1000);
+
+      /**
+       * this interval ticks twice for every beat per minute
+       * if the metronome is set to timer mode, additional logic is needed to check
+       *   if the pattern needs to be updated
+       */
+
       intervalId = setInterval(() => {
         if ($reps.selected) updateByReps();
 
@@ -85,7 +92,6 @@
     bpm = Math.min(bpm, 240);
 
     if (playing) {
-      togglePlaying();
       togglePlaying();
     }
   };
