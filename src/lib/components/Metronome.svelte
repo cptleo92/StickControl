@@ -10,7 +10,7 @@
   // loads in an audio click and plays on every other tick
   const audio = new Audio(metronomeSFX);
 
-  $: downbeat = $counter % 2 === 0;
+  $: downbeat = $counter % 2 !== 0;
 
   $: if (playing && downbeat) {
     audio.currentTime = 0;
