@@ -7,22 +7,22 @@
   const {Renderer, Stave, Formatter, Beam} = Vex.Flow;
 
   export const drawNotes = () => {
-    const container = document.querySelector('.container-prev');
+    const output = document.querySelector('.output-prev');
 
     // @ts-ignore
-    const renderer = new Renderer(container, Renderer.Backends.SVG);
+    const renderer = new Renderer(output, Renderer.Backends.SVG);
 
-    renderer.resize(575, 100);
+    renderer.resize(540, 100);
     const context = renderer.getContext();
 
-    const staveMeasure1 = new Stave(0, 0, 280);
+    const staveMeasure1 = new Stave(0, 0, 265);
     staveMeasure1.setContext(context).draw();
 
     const staveMeasure2 = new Stave(
       // @ts-ignore
       staveMeasure1.width + staveMeasure1.x,
       0,
-      280
+      265
     );
     staveMeasure2.setContext(context).draw();
 
@@ -48,14 +48,14 @@
 </script>
 
 <div
-  class={`flex items-center mt-8 transition-all
+  class={`flex items-center justify-center mt-8 transition-all
   ${previewClass}
 `}
 >
-  <p class={`translate-y-2 text-5xl mx-4`}>
+  <p class={`translate-y-2 text-2xl mr-4`}>
     {$currentPattern < 8 ? '0' : ''}{$currentPattern + 2}
   </p>
-  <div class="text-center container-prev" />
+  <div class="text-center output-prev relative">
+    <NotationLetters pattern={$patterns[$currentPattern + 1]} preview={true} />
+  </div>
 </div>
-
-<NotationLetters pattern={$patterns[$currentPattern + 1]} preview={true} />

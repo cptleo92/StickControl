@@ -18,21 +18,14 @@
 <Nav />
 {#if ready}
   <div
-    class="main box-border flex flex-col justify-center my-8 max-w-screen-md m-auto bg-white p-8 border rounded-md shadow-md"
+    class="main box-border flex flex-col justify-center my-8 md:max-w-screen-md m-auto bg-white p-8 border rounded-md shadow-md"
   >
-    <!-- <div class="text-center">
-    <h1>Stick Control</h1>
-    <h2>for the Snare Drummer</h2>
-    <h4>
-      <em>... for the Screen</em>
-    </h4>
-  </div> -->
     <div class="relative border p-2 rounded-md">
       <img class="w-[60%] m-auto" src="/stick-control.png" alt="logo" />
 
       <h4
         in:fly={{delay: 1000, duration: 1000, x: -50}}
-        class="absolute right-36 top-64 font-semibold underline"
+        class="absolute top-1/2 left-1/2 font-semibold underline "
       >
         <em>... for the Screen</em>
       </h4>

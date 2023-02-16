@@ -178,14 +178,14 @@
       />
     </p>
 
-    <div class="grid grid-cols-2 gap-12 w-[100%] mt-4">
+    <div class="flex flex-wrap justify-center gap-12 w-[100%] mt-4">
       <div
-        class={`flex flex-col border-gray-400 border-2 rounded-lg p-8 ${
+        class={`flex flex-col w-[250px] border-gray-400 border-2 rounded-lg p-8 ${
           $reps.selected && 'bg-green-100'
         }`}
       >
         <p class="flex justify-end items-center">
-          Reps (1 - 60): <input
+          Repetitions (1 - 60): <input
             class="text-3xl font-bold border p-1 w-24 text-center ml-2"
             type="number"
             min="1"
@@ -201,7 +201,7 @@
       </div>
 
       <div
-        class={`flex flex-col border-gray-400 border-2 rounded-lg p-8 ${
+        class={`flex flex-col w-[250px] border-gray-400 border-2 rounded-lg p-8 ${
           $timer.selected && 'bg-green-100'
         }`}
       >
@@ -239,6 +239,10 @@
       >
     </p>
   {/if}
+
+  <p class="hidden max-[580px]:block text-center text-green-600">
+    Flip your device to landscape for best results!
+  </p>
 </section>
 
 <style>
