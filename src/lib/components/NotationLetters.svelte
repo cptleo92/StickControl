@@ -13,11 +13,11 @@
     ($reps.selected && $counter > ($reps.count - 1) * 16) ||
     ($timer.selected && $timer.currentSeconds <= 3)
       ? 'opacity-25'
-      : 'opacity-0';
+      : 'opacity-40';
 
   $: letterClass = idx => {
-    if (preview) return 'letter mr-[23px]';
-    return `letter mr-[23px] ${
+    if (preview) return 'letter mr-[21px]';
+    return `letter mr-[21px] ${
       idx === ($counter - 1) % 16 &&
       'text-emerald-800 font-bold translate-y-1 transition-all'
     }`;
@@ -25,7 +25,9 @@
 </script>
 
 <div
-  class={`flex translate-x-[103px] ${preview && previewClass} transition-all`}
+  class={`flex absolute top-full left-4 ${
+    preview && previewClass
+  } transition-all`}
 >
   {#each letters.slice(0, 8) as letter, idx}
     <p class={letterClass(idx)}>

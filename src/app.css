@@ -26,6 +26,6 @@
   }
 
   h4 {
-    @apply  text-xl my-1
+    @apply  text-sm md:text-xl my-1
   }
 }
