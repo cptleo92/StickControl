@@ -3,7 +3,7 @@
 
 import Vex from "vexflow";
 import { parsePattern } from "./patternUtils";
-const { StaveNote, Tuplet } = Vex.Flow;
+const { StaveNote } = Vex.Flow;
 
 function createNote(char) {
   return char === "r"

@@ -6,23 +6,11 @@
   import NotationLetters from './NotationLetters.svelte';
   const {Renderer, Stave, Formatter, Beam, Tuplet} = Vex.Flow;
 
-  const staveSize = {
-    sm: [],
-    md: [],
-    lg: [575, 280]
-  };
-
   export const drawNotes = () => {
     const output = document.querySelector('.output');
 
     // @ts-ignore
     const renderer = new Renderer(output, Renderer.Backends.SVG);
-
-    // calculate how big the staves will be
-    const main = document.querySelector('.main');
-    const {width} = main.getBoundingClientRect();
-    console.log(width);
-    const scale = Math.min(1, width / 768);
 
     renderer.resize(540, 100);
     const context = renderer.getContext();
