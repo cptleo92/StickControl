@@ -1,10 +1,10 @@
 <script>
   import Vex from 'vexflow';
-  import {counter, reps, timer, currentPattern, patterns} from '../store';
+  import {counter, reps, timer, currentPattern, patterns, currentPatternInfo} from '../store';
   import {patternToStave} from '../patterns/patternToStave';
   import {onMount} from 'svelte';
   import NotationLetters from './NotationLetters.svelte';
-  const {Renderer, Stave, Formatter, Beam} = Vex.Flow;
+  const {Renderer, Stave, Formatter, Beam, Tuplet} = Vex.Flow;
 
   const staveSize = {
     sm: [],
@@ -24,12 +24,8 @@
     console.log(width);
     const scale = Math.min(1, width / 768);
 
-    // const staveWidth = width / 2.7;
-    // const contextWidth = staveWidth * 2 + 25;
-
     renderer.resize(540, 100);
     const context = renderer.getContext();
-    // context.scale(scale, scale);
 
     const staveMeasure1 = new Stave(0, 0, 265);
     staveMeasure1.setContext(context).draw();
@@ -42,17 +38,28 @@
     );
     staveMeasure2.setContext(context).draw();
 
-    const notes = patternToStave($patterns[$currentPattern]);
+    const measures = patternToStave($patterns[$currentPattern]);
 
-    const beams = notes.map(beam => new Beam(beam));
+    Formatter.FormatAndDraw(context, staveMeasure1, measures[0].allNotes);
+    Formatter.FormatAndDraw(context, staveMeasure2, measures[1].allNotes);
 
-    Formatter.FormatAndDraw(context, staveMeasure1, notes[0].concat(notes[1]));
-    Formatter.FormatAndDraw(context, staveMeasure2, notes[2].concat(notes[3]));
-
-    beams.forEach(b => {
-      b.setContext(context).draw();
+    measures.forEach(m => {
+      m.beams.forEach(notes => {
+        new Beam(notes).setContext(context).draw();
+      });
+      m.tuplets.forEach(notes => {
+        new Tuplet(notes).setContext(context).draw();
+      });
     });
+
+    // Extract rendered x-positions of all notes for letter alignment
+    noteXPositions = [
+      ...measures[0].allNotes.map(n => n.getAbsoluteX()),
+      ...measures[1].allNotes.map(n => n.getAbsoluteX())
+    ];
   };
+
+  let noteXPositions = [];
 
   onMount(() => drawNotes());
 </script>
@@ -62,13 +69,13 @@
     $counter === 0 && 'opacity-0'
   }`}
 >
-  {$reps.selected ? Math.ceil($counter / 16) : $timer.currentSeconds}
+  {$reps.selected ? Math.ceil($counter / $currentPatternInfo.totalNotes) : $timer.currentSeconds}
 </div>
 <div class="flex items-center justify-center">
   <p class={`translate-y-2 text-2xl mr-4`}>
     {$currentPattern < 9 ? '0' : ''}{$currentPattern + 1}
   </p>
   <div class="text-center output relative">
-    <NotationLetters pattern={$patterns[$currentPattern]} />
+    <NotationLetters pattern={$patterns[$currentPattern]} {noteXPositions} />
   </div>
 </div>
