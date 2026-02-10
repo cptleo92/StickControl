@@ -39,6 +39,20 @@
   function scheduler() {
     while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
       const info = $currentPatternInfo;
+
+      // Handle deferred pattern transition from previous tick
+      if ($reps.selected && $counter > 0 && $counter % ($reps.count * info.totalNotes) === 0) {
+        $currentPattern = ($currentPattern + 1) % $patterns.length;
+        $counter = 0;
+        return;
+      }
+      if ($counter > 0 && $timer.currentSeconds === 0 && $counter % info.totalNotes === 0) {
+        $currentPattern = ($currentPattern + 1) % $patterns.length;
+        $counter = 0;
+        $timer.currentSeconds = $timer.startSeconds;
+        return;
+      }
+
       const noteIndex = $counter % info.totalNotes;
 
       // Schedule click sound on beat boundaries
@@ -54,22 +68,13 @@
       // Advance counter (with Svelte store update)
       $counter++;
 
-      // Check reps/timer transitions after incrementing
-      if ($reps.selected) {
-        if ($counter > 0 && $counter % ($reps.count * info.totalNotes) === 0) {
-          $currentPattern = ($currentPattern + 1) % $patterns.length;
-          $counter = 0;
-        }
+      // If counter just reached a transition point, exit so Svelte can render
+      // the last note highlight before transitioning on the next tick
+      if ($reps.selected && $counter > 0 && $counter % ($reps.count * info.totalNotes) === 0) {
+        return;
       }
-
-      if (
-        $counter > 0 &&
-        $timer.currentSeconds === 0 &&
-        $counter % info.totalNotes === 0
-      ) {
-        $currentPattern = ($currentPattern + 1) % $patterns.length;
-        $counter = 0;
-        $timer.currentSeconds = $timer.startSeconds;
+      if ($counter > 0 && $timer.currentSeconds === 0 && $counter % info.totalNotes === 0) {
+        return;
       }
     }
   }
