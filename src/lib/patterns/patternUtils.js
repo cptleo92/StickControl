@@ -1,24 +1,13 @@
 /**
  * Parse a pattern string into structured format.
  *
- * Supports:
- * - Old format: "rlrl rlrl rlrl rlrl"
- *   (4 space-separated groups, split evenly into 2 measures)
- * - New format: "rlrl (rlr) (lrl) | rlrl (rlr) (lrl)"
+ * Format: "rlrl (rlr) (lrl) | rlrl (rlr) (lrl)"
  *   | separates measures, () marks triplet groups
  *
  * Returns: array of 2 measures, each measure is an array of groups
  * Group: { notes: string, triplet: boolean }
  */
 export function parsePattern(pattern) {
-  // Old format: simple space-separated string with no | or ()
-  if (!pattern.includes('|') && !pattern.includes('(')) {
-    const groups = pattern.split(' ').map(notes => ({ notes, triplet: false }));
-    const mid = Math.floor(groups.length / 2);
-    return [groups.slice(0, mid), groups.slice(mid)];
-  }
-
-  // New format with | and possibly ()
   const measureStrings = pattern.split('|').map(s => s.trim());
   return measureStrings.map(measure => {
     const groups = [];
