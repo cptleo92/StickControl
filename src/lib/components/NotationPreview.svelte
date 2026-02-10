@@ -8,6 +8,10 @@
 
   export const drawNotes = () => {
     const output = document.querySelector('.output-prev');
+    if (!output) return;
+
+    // Remove previous VexFlow SVG without destroying Svelte children
+    output.querySelectorAll(':scope > svg').forEach(el => el.remove());
 
     // @ts-ignore
     const renderer = new Renderer(output, Renderer.Backends.SVG);
@@ -28,17 +32,16 @@
 
     const measures = patternToStave($patterns[$currentPattern + 1]);
 
+    const beamInstances = [];
+    measures.forEach(m => {
+      m.beams.forEach(notes => beamInstances.push(new Beam(notes)));
+      m.tuplets.forEach(notes => beamInstances.push(new Tuplet(notes)));
+    });
+
     Formatter.FormatAndDraw(context, staveMeasure1, measures[0].allNotes);
     Formatter.FormatAndDraw(context, staveMeasure2, measures[1].allNotes);
 
-    measures.forEach(m => {
-      m.beams.forEach(notes => {
-        new Beam(notes).setContext(context).draw();
-      });
-      m.tuplets.forEach(notes => {
-        new Tuplet(notes).setContext(context).draw();
-      });
-    });
+    beamInstances.forEach(b => b.setContext(context).draw());
 
     // Extract rendered x-positions of all notes for letter alignment
     noteXPositions = [
@@ -48,6 +51,7 @@
   };
 
   let noteXPositions = [];
+  let mounted = false;
 
   $: previewClass =
     ($reps.selected && $counter > ($reps.count - 1) * $currentPatternInfo.totalNotes) ||
@@ -55,7 +59,13 @@
       ? 'opacity-25'
       : 'opacity-0';
 
-  onMount(() => drawNotes());
+  onMount(() => { mounted = true; });
+
+  // Reactively redraw when pattern changes
+  $: if (mounted && $currentPattern < $patterns.length - 1) {
+    $currentPattern;
+    drawNotes();
+  }
 </script>
 
 <div

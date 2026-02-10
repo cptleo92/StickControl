@@ -6,9 +6,9 @@
   export let preview = false;
   export let noteXPositions = [];
 
-  const info = getPatternInfo(pattern);
-  const letters = info.letters.map(c => c.toUpperCase());
-  const totalNotes = info.totalNotes;
+  $: info = getPatternInfo(pattern);
+  $: letters = info.letters.map(c => c.toUpperCase());
+  $: totalNotes = info.totalNotes;
 
   $: previewClass =
     ($reps.selected && $counter > ($reps.count - 1) * totalNotes) ||

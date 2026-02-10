@@ -32,12 +32,10 @@
     </div>
     <Metronome />
 
-    {#key $currentPattern}
-      <Notation />
-      {#if $currentPattern < $patterns.length - 1}
-        <NotationPreview />
-      {/if}
-    {/key}
+    <Notation />
+    {#if $currentPattern < $patterns.length - 1}
+      <NotationPreview />
+    {/if}
 
     <Instructions />
   </div>
