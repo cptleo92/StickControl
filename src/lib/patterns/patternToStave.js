@@ -1,22 +1,37 @@
-// pattern is a string with 4 groups
-// splitting the pattern gives us ["rlrl", "rlrl", "rlrl", "rlrl"]
-// we want to map each string to a beam of stave notes
+// Converts a pattern string into VexFlow StaveNote objects for rendering.
+// Returns an array of 2 measures, each with { allNotes, beams, tuplets }.
 
-// new StaveNote({ keys: ["c/5"], duration: "8" }),
-// new StaveNote({ keys: ["a/4"], duration: "8" }),
 import Vex from "vexflow";
+import { parsePattern } from "./patternUtils";
 const { StaveNote } = Vex.Flow;
 
-export const patternToStave = (pattern) => {
-  const groups = pattern.split(" ")
+function createNote(char) {
+  return char === "r"
+    ? new StaveNote({ keys: ["c/5"], duration: "8" })
+    : new StaveNote({ keys: ["a/4"], duration: "8" });
+}
 
-  return groups.map(group => {
-    const notes = []
-    for (let char of group) {
-      char === "r"
-        ? notes.push(new StaveNote({ keys: ["c/5"], duration: "8" }))
-        : notes.push(new StaveNote({ keys: ["a/4"], duration: "8" }))
-    }
-    return notes
-  })
+export const patternToStave = (pattern) => {
+  const parsed = parsePattern(pattern);
+
+  return parsed.map(measure => {
+    const allNotes = [];
+    const beams = [];
+    const tuplets = [];
+
+    measure.forEach(group => {
+      const notes = [];
+      for (const char of group.notes) {
+        const note = createNote(char);
+        notes.push(note);
+        allNotes.push(note);
+      }
+      beams.push(notes);
+      if (group.triplet) {
+        tuplets.push(notes);
+      }
+    });
+
+    return { allNotes, beams, tuplets };
+  });
 }

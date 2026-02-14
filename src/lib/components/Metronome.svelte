@@ -1,20 +1,82 @@
 <script>
   import metronomeSFX from '/metronome.mp3';
-  import {counter, reps, timer, currentPattern, patterns} from '../store';
+  import {counter, reps, timer, currentPattern, patterns, currentPatternInfo} from '../store';
   import {fade} from 'svelte/transition';
 
   let bpm = 120;
   let playing = false;
-  let intervalId;
 
-  // loads in an audio click and plays on every other tick
-  const audio = new Audio(metronomeSFX);
+  // --- Web Audio API setup for precise scheduling ---
+  let audioCtx = null;
+  let clickBuffer = null;
 
-  $: downbeat = $counter % 2 !== 0;
+  async function initAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const response = await fetch(metronomeSFX);
+    const arrayBuffer = await response.arrayBuffer();
+    clickBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+  }
 
-  $: if (playing && downbeat) {
-    audio.currentTime = 0;
-    audio.play();
+  function playClickAtTime(when) {
+    if (!audioCtx || !clickBuffer) return;
+    const source = audioCtx.createBufferSource();
+    source.buffer = clickBuffer;
+    source.connect(audioCtx.destination);
+    source.start(when);
+  }
+
+  // --- Scheduler state ---
+  let schedulerTimer = null;
+  let nextNoteTime = 0;       // AudioContext time for the next note
+  const scheduleAheadTime = 0.1; // seconds to look ahead
+  const lookaheadMs = 25;     // how often to call scheduler (ms)
+
+  /**
+   * The scheduler runs on a setInterval and schedules notes into the future
+   * using the AudioContext clock. This avoids setTimeout drift entirely.
+   */
+  function scheduler() {
+    while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
+      const info = $currentPatternInfo;
+
+      // Handle deferred pattern transition from previous tick
+      if ($reps.selected && $counter > 0 && $counter % ($reps.count * info.totalNotes) === 0) {
+        $currentPattern = ($currentPattern + 1) % $patterns.length;
+        $counter = 0;
+        return;
+      }
+      if ($counter > 0 && $timer.currentSeconds === 0 && $counter % info.totalNotes === 0) {
+        $currentPattern = ($currentPattern + 1) % $patterns.length;
+        $counter = 0;
+        $timer.currentSeconds = $timer.startSeconds;
+        return;
+      }
+
+      const noteIndex = $counter % info.totalNotes;
+
+      // Schedule click sound on beat boundaries
+      if (info.beatPositions.includes(noteIndex)) {
+        playClickAtTime(nextNoteTime);
+      }
+
+      // Advance time by this note's duration in seconds
+      const duration = info.durations[noteIndex]; // in beats
+      const seconds = (60 / bpm) * duration;
+      nextNoteTime += seconds;
+
+      // Advance counter (with Svelte store update)
+      $counter++;
+
+      // If counter just reached a transition point, exit so Svelte can render
+      // the last note highlight before transitioning on the next tick
+      if ($reps.selected && $counter > 0 && $counter % ($reps.count * info.totalNotes) === 0) {
+        return;
+      }
+      if ($counter > 0 && $timer.currentSeconds === 0 && $counter % info.totalNotes === 0) {
+        return;
+      }
+    }
   }
 
   const handleStart = () => {
@@ -38,53 +100,29 @@
     }, 1000);
   };
 
-  const updateByReps = () => {
-    if ($counter > 0 && $counter % ($reps.count * 16) === 0) {
-      $currentPattern = ($currentPattern + 1) % $patterns.length;
-      $counter = 0;
-    }
-  };
-
   const updateTimer = () => {
     if ($timer.currentSeconds !== 0) $timer.currentSeconds -= 1;
   };
 
   let timerInterval;
-  const togglePlaying = () => {
+  const togglePlaying = async () => {
     if (playing) {
-      audio.currentTime = 0;
-      clearInterval(intervalId);
+      clearInterval(schedulerTimer);
       clearInterval(timerInterval);
+      schedulerTimer = null;
       playing = false;
       $counter = 0;
     } else {
-      $timer.currentSeconds = $timer.startSeconds;
+      await initAudio();
+      if (audioCtx.state === 'suspended') await audioCtx.resume();
 
+      $timer.currentSeconds = $timer.startSeconds;
       if ($timer.selected) timerInterval = setInterval(updateTimer, 1000);
 
-      /**
-       * this interval ticks twice for every beat per minute
-       * if the metronome is set to timer mode, additional logic is needed to check
-       *   if the pattern needs to be updated
-       */
-
-      intervalId = setInterval(() => {
-        if ($reps.selected) updateByReps();
-
-        if (
-          $counter > 0 &&
-          $timer.currentSeconds === 0 &&
-          $counter % 16 === 0
-        ) {
-          $currentPattern = ($currentPattern + 1) % $patterns.length;
-          $counter = 0;
-          $timer.currentSeconds = $timer.startSeconds;
-        }
-
-        $counter++;
-      }, (60 / bpm) * 500);
-
       playing = true;
+      $counter = 0;
+      nextNoteTime = audioCtx.currentTime;
+      schedulerTimer = setInterval(scheduler, lookaheadMs);
     }
   };
 

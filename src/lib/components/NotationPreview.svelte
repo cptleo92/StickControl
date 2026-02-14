@@ -1,13 +1,17 @@
 <script>
   import Vex from 'vexflow';
-  import {counter, reps, timer, currentPattern, patterns} from '../store';
+  import {counter, reps, timer, currentPattern, patterns, currentPatternInfo} from '../store';
   import {patternToStave} from '../patterns/patternToStave';
   import {onMount} from 'svelte';
   import NotationLetters from './NotationLetters.svelte';
-  const {Renderer, Stave, Formatter, Beam} = Vex.Flow;
+  const {Renderer, Stave, Formatter, Beam, Tuplet} = Vex.Flow;
 
   export const drawNotes = () => {
     const output = document.querySelector('.output-prev');
+    if (!output) return;
+
+    // Remove previous VexFlow SVG without destroying Svelte children
+    output.querySelectorAll(':scope > svg').forEach(el => el.remove());
 
     // @ts-ignore
     const renderer = new Renderer(output, Renderer.Backends.SVG);
@@ -26,25 +30,42 @@
     );
     staveMeasure2.setContext(context).draw();
 
-    const notes = patternToStave($patterns[$currentPattern + 1]);
+    const measures = patternToStave($patterns[$currentPattern + 1]);
 
-    const beams = notes.map(beam => new Beam(beam));
-
-    Formatter.FormatAndDraw(context, staveMeasure1, notes[0].concat(notes[1]));
-    Formatter.FormatAndDraw(context, staveMeasure2, notes[2].concat(notes[3]));
-
-    beams.forEach(b => {
-      b.setContext(context).draw();
+    const beamInstances = [];
+    measures.forEach(m => {
+      m.beams.forEach(notes => beamInstances.push(new Beam(notes)));
+      m.tuplets.forEach(notes => beamInstances.push(new Tuplet(notes)));
     });
+
+    Formatter.FormatAndDraw(context, staveMeasure1, measures[0].allNotes);
+    Formatter.FormatAndDraw(context, staveMeasure2, measures[1].allNotes);
+
+    beamInstances.forEach(b => b.setContext(context).draw());
+
+    // Extract rendered x-positions of all notes for letter alignment
+    noteXPositions = [
+      ...measures[0].allNotes.map(n => n.getAbsoluteX()),
+      ...measures[1].allNotes.map(n => n.getAbsoluteX())
+    ];
   };
 
+  let noteXPositions = [];
+  let mounted = false;
+
   $: previewClass =
-    ($reps.selected && $counter > ($reps.count - 1) * 16) ||
+    ($reps.selected && $counter > ($reps.count - 1) * $currentPatternInfo.totalNotes) ||
     ($timer.selected && $timer.currentSeconds <= 3)
       ? 'opacity-25'
       : 'opacity-0';
 
-  onMount(() => drawNotes());
+  onMount(() => { mounted = true; });
+
+  // Reactively redraw when pattern changes
+  $: if (mounted && $currentPattern < $patterns.length - 1) {
+    $currentPattern;
+    drawNotes();
+  }
 </script>
 
 <div
@@ -56,6 +77,6 @@
     {$currentPattern < 8 ? '0' : ''}{$currentPattern + 2}
   </p>
   <div class="text-center output-prev relative">
-    <NotationLetters pattern={$patterns[$currentPattern + 1]} preview={true} />
+    <NotationLetters pattern={$patterns[$currentPattern + 1]} preview={true} {noteXPositions} />
   </div>
 </div>
