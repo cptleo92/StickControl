@@ -7,9 +7,9 @@ on:
       - '**/.md'
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
 
       - name: Use Node.js 16.x
         uses: actions/setup-node@v3
